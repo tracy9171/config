@@ -1,0 +1,85 @@
+spring:
+  profiles: dev
+  #排除原生Druid的快速配置类
+  autoconfigure:
+    exclude:
+      - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  # DB 配置
+  datasource:
+    dynamic:
+      druid: #以下是全局默认值，可以全局更改
+        initial-size: 5
+        max-active: 20
+        min-idle: 5
+        max-wait: 60000
+        time-between-eviction-runs-millis: 60000
+        min-evictable-idle-time-millis: 300000
+        test-while-idle: true
+        test-on-borrow: false
+        test-on-return: false
+        validation-query: SELECT 1 FROM DUAL
+        pool-prepared-statements: true
+        max-pool-prepared-statement-per-connection-size: 20
+        filters: stat,wall #,log4j
+        #        connection-properties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+        stat:
+          merge-sql: true
+          log-slow-sql: true
+          slow-sql-millis: 5000
+      #默认数据库
+      primary: db1
+      datasource:
+        db1:
+          driver-class-name: com.mysql.jdbc.Driver
+          url: ${aliyun.data.source.dev1.url}
+          username: ${aliyun.data.source.dev1.username}
+          password: ${aliyun.data.source.dev1.password}
+          druid:
+            public-key: ${aliyun.data.source.dev1.public.key}
+        db2:
+          driver-class-name: com.mysql.jdbc.Driver
+          url: ${aliyun.data.source.dev1.url}
+          username: ${aliyun.data.source.dev1.username}
+          password: ${aliyun.data.source.dev1.password}
+          druid:
+            public-key: ${aliyun.data.source.dev1.public.key}
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+    timeout: 5000ms
+
+eureka:
+  instance:
+    prefer-ip-address: true #注册服务的时候使用服务的ip地址
+  client:
+    service-url:
+      defaultZone: http://${spring.security.user.name}:${spring.security.user.password}@127.0.0.1:8762/eureka/
+
+#分布式事物
+tx-lcn:
+  ribbon:
+    loadbalancer:
+      dtx:
+        enabled: true #是否启动LCN负载均衡策略(优化选项，开启与否，功能不受影响)
+  client:
+    manager-address: 127.0.0.1:8087
+  logger:
+    enabled: true
+    driver-class-name: com.mysql.jdbc.Driver
+    jdbc-url: ${aliyun.data.source.dev1.url}
+    username: ${aliyun.data.source.dev1.username}
+    password: ${aliyun.data.source.dev1.passWord}
+#日誌
+logging:
+  level:
+    com:
+      codingapi:
+        txlcn: DEBUG
